@@ -28,7 +28,7 @@ function SignoutButton() {
   return (
     <button
       onClick={() => {
-        signOut();
+        signOut({ callbackUrl: "/" });
       }}
       className="btn text-sm font-semibold leading-6 text-gray-900"
     >
