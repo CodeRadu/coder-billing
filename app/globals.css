@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .input {
+    @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring;
+  }
+  .btn {
+    @apply font-bold py-2 px-4 rounded focus:outline-none focus:ring;
+  }
+  .table {
+    @apply flex flex-col overflow-x-auto p-1.5 min-w-full align-middle overflow-hidden;
+  }
+  table {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+  tr {
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800;
+  }
+  td {
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800;
+  }
+  th {
+    @apply px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase;
+  }
+  tbody {
+    @apply divide-y divide-gray-200;
+  }
+}
