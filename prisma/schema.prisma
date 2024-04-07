@@ -13,22 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Account {
-  id                 String    @id @default(cuid())
-  userId             String
-  providerType       String
-  providerId         String
-  providerAccountId  String
-  refreshToken       String?
-  accessToken        String?
-  accessTokenExpires DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  user               User      @relation(fields: [userId], references: [id])
-
-  @@unique([providerId, providerAccountId])
-}
-
 model User {
   id               String          @id @default(cuid())
   coderUserId      String
@@ -37,7 +21,6 @@ model User {
   email            String          @unique
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
-  accounts         Account[]
   password         String
   admin            Boolean         @default(false)
   workspaces       Workspace[]
@@ -69,15 +52,15 @@ model Workspace {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   builds     Build[]
-  template   Template? @relation(fields: [templateId], references: [id])
+  template   Template? @relation(fields: [templateId], references: [id], onDelete: Cascade)
   templateId String
-  User       User?     @relation(fields: [userId], references: [id])
+  User       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
 }
 
 model Build {
   id          String    @id @default(cuid())
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   workspaceId String
