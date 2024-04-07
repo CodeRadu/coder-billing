@@ -3,6 +3,8 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { getCoderApiUser } from "@/util/coder/user";
 import { finishSetup } from "@/actions/setup";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const apiUser = await getCoderApiUser();
 
