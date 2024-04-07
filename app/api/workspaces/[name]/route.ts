@@ -9,7 +9,8 @@ const prisma = getPrisma()
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const { workspaceId, transition } = body
-  const workspace = await coderApiRequest("GET", `/workspaces/${workspaceId}`) as CoderWorkspace
+  const workspace = await coderApiRequest("GET", `/workspaces/${workspaceId}`).catch(() => null) as CoderWorkspace | null
+  if (!workspace) return NextResponse.json({ status: "ok, workspace not found" })
   const template = await prisma.template.findUnique({ where: { id: workspace.template_id } })
   if (!template) {
     return NextResponse.json({ status: "ok, template not configured" })
