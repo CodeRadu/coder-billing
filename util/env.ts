@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const envSchema = z.object({
   NEXTAUTH_SECRET: z.string(),
-  NEXTAUTH_URL: z.string().url().optional(),
+  NEXTAUTH_URL: z.string().url(),
   DATABASE_URL: z.string().url(),
   PUBLIC_URL: z.string().url(),
   CODER_URL: z.string().url(),
