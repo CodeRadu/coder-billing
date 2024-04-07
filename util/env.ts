@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const envSchema = z.object({
   NEXTAUTH_SECRET: z.string(),
+  NEXTAUTH_URL: z.string().url().optional(),
   DATABASE_URL: z.string().url(),
   PUBLIC_URL: z.string().url(),
   CODER_URL: z.string().url(),
@@ -13,4 +14,4 @@ export const envSchema = z.object({
 })
 
 export type Env = z.infer<typeof envSchema>
-export const env = envSchema.safeParse(process.env)
+export const env = envSchema.parse(process.env)
