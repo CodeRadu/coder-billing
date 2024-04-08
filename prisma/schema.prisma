@@ -24,7 +24,7 @@ model User {
   password         String
   admin            Boolean         @default(false)
   workspaces       Workspace[]
-  stripeCustomer   StripeCustomer? @relation(fields: [stripeCustomerId], references: [id])
+  stripeCustomer   StripeCustomer?
   stripeCustomerId String?
 }
 
@@ -33,16 +33,31 @@ model StripeCustomer {
   stripeSubscriptionId      String
   stripeSubscriptionEndDate Int?
   subscriptionItemId        String
-  User                      User[]
+  User                      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                    String @unique
 }
 
 model Template {
-  id           String      @id
+  id          String             @id
+  name        String
+  displayName String
+  workspaces  Workspace[]
+  version     String
+  resources   TemplateResource[]
+}
+
+model TemplateResource {
+  id           String   @id
   name         String
-  displayName  String
-  workspaces   Workspace[]
-  startedPrice Float
-  stoppedPrice Float
+  type         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  Template     Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateId   String
+  startedPrice Float?
+  stoppedPrice Float?
+
+  @@unique([name, templateId])
 }
 
 model Workspace {

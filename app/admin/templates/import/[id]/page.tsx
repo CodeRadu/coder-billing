@@ -11,6 +11,14 @@ type Props = {
   };
 };
 
+export async function generateMetadata({ params }: Props) {
+  const id = params.id;
+  const template = await getCoderTemplate(id);
+  return {
+    title: `Import template ${template?.display_name || template?.name}`,
+  };
+}
+
 export default async function Page({ params }: Props) {
   const template = await getCoderTemplate(params.id);
   const importedTemplate = await getTemplate(params.id);

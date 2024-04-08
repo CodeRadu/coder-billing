@@ -3,10 +3,15 @@ import { getAllUsers } from "@/util/db/user";
 import { getServerSession } from "next-auth";
 import { DeleteUserButton, ImportUserButton } from "./Actions";
 import { getPrisma } from "@/util/db";
-
-const prisma = getPrisma();
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Manage users",
+};
+
+const prisma = getPrisma();
 
 export default async function Users() {
   const session = await getServerSession();

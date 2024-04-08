@@ -1,3 +1,5 @@
+"use server"
+
 import { CoderTemplate } from "@/types/coder";
 import { getPrisma } from "../db";
 import { Template } from "@prisma/client";
@@ -16,4 +18,12 @@ export async function getTemplate(id: string) {
 export async function getAllTemplates() {
   const templates = await prisma.template.findMany()
   return templates
+}
+
+export async function deleteTemplate(id: string) {
+  return prisma.template.delete({
+    where: {
+      id
+    }
+  })
 }

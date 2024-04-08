@@ -38,6 +38,14 @@ export async function POST(req: NextRequest) {
             subscriptionItemId: itemId
           }
         })
+        await prisma.user.update({
+          where: {
+            email: email!
+          },
+          data: {
+            stripeCustomerId: customer.id
+          }
+        })
         break;
       }
       case "customer.subscription.updated": {
@@ -54,9 +62,17 @@ export async function POST(req: NextRequest) {
       }
       case "customer.subscription.deleted": {
         const subscription: Stripe.Subscription = event.data.object
-        await prisma.stripeCustomer.delete({
+        const deletedCustomer = await prisma.stripeCustomer.delete({
           where: {
             id: subscription.customer as string
+          },
+        })
+        await prisma.user.update({
+          where: {
+            id: deletedCustomer.userId
+          },
+          data: {
+            stripeCustomerId: null
           }
         })
         await stripe.customers.del(subscription.customer as string)

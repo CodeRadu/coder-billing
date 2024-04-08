@@ -87,3 +87,29 @@ export type CoderWorkspace = {
   allow_renames: boolean,
   favorite: boolean
 }
+
+enum WorkspaceTransition {
+  START = "start",
+  STOP = "stop",
+  DESTROY = "destroy"
+}
+
+export type CoderTemplateResource = {
+  id: string,
+  agents?: any[]
+  created_at: string,
+  daily_cost: number,
+  hide: boolean,
+  name: string,
+  type: string,
+  icon: string,
+  job_id: string,
+  workspace_transition: WorkspaceTransition,
+  metadata?: [
+    {
+      key: string,
+      value: string,
+      sensitive: boolean
+    }
+  ]
+}

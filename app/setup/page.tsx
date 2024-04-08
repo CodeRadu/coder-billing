@@ -1,7 +1,7 @@
 import Input from "@/components/Input";
 import { SubmitButton } from "@/components/SubmitButton";
 import { getCoderApiUser } from "@/util/coder/user";
-import { finishSetup } from "@/actions/setup";
+import { finishSetup } from "./actions";
 
 export const dynamic = "force-dynamic";
 

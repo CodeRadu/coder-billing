@@ -9,22 +9,28 @@ const prisma = getPrisma()
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const { workspaceId, transition } = body
-  const workspace = await coderApiRequest("GET", `/workspaces/${workspaceId}`).catch(() => null) as CoderWorkspace | null
-  if (!workspace) return NextResponse.json({ status: "ok, workspace not found" })
-  const template = await prisma.template.findUnique({ where: { id: workspace.template_id } })
-  if (!template) {
-    return NextResponse.json({ status: "ok, template not configured" })
-  }
-  if (!template?.startedPrice || !template?.stoppedPrice) {
-    return NextResponse.json({ status: "ok, no price" })
-  }
+
+  const workspace = await coderApiRequest("GET", `/workspaces/${workspaceId}`).catch(() => null) as CoderWorkspace | null // Get the workspace from Coder
+  if (!workspace) return NextResponse.json({ status: "ok, workspace not found" }) // Probably a template update with a bogus workspace id
+
+  const template = await prisma.template.findUnique({ where: { id: workspace.template_id }, include: { resources: true } })
+  if (!template) return NextResponse.json({ status: "ok, template not configured" })
+
   const user = await prisma.user.findUnique({ where: { username: workspace.owner_name } })
-  if (user?.admin) return NextResponse.json({ status: "ok, user is admin" })
+  if (user?.admin) return NextResponse.json({ status: "ok, user is admin" }) // Don't charge admins
+
   const customer = await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } })
-  if (customer?.stripeSubscriptionEndDate && transition == "start") {
-    // Prevent the user from starting the workspace if the subscription has been cancelled
-    return NextResponse.json({ status: "subscription ended" }, { status: 500 })
-  }
+
+  // Calculate pricing from resources
+  const startedPrice = template.resources.reduce((total, resource) => {
+    return total + (resource.startedPrice || 0);
+  }, 0);
+  const stoppedPrice = template.resources.reduce((total, resource) => {
+    return total + (resource.stoppedPrice || 0);
+  }, 0);
+
+  if (startedPrice === 0 && stoppedPrice === 0) return NextResponse.json({ status: "ok, no pricing" })
+
   if (!await prisma.workspace.findUnique({ where: { id: workspaceId } })) {
     await prisma.workspace.create({
       data: {
@@ -36,52 +42,60 @@ export async function POST(req: NextRequest) {
       }
     })
   }
-  const build = await prisma.build.create({
-    data: {
-      action: transition,
-      workspaceId: workspaceId
+  // Get the last build
+  const lastBuild = await prisma.build.findFirst({
+    where: {
+      workspaceId,
+    },
+    orderBy: {
+      createdAt: "desc",
     }
   })
-  // We have the latest build
-  // If this build stops the workspace, we need to find the last start build
-  if (transition == "stop" || transition == "destroy") {
-    const lastStart = await prisma.build.findFirst({
-      where: {
-        workspaceId,
-        action: "start"
-      },
-      orderBy: {
-        createdAt: "desc"
-      }
-    })
-    if (!lastStart) return NextResponse.json({ status: "ok" })
-    const timeDifference = (new Date(build.createdAt).getTime() - new Date(lastStart!.createdAt).getTime()) / (1000 * 60 * 60)
-    // We will now tell stripe that the user has used the workspace for this amount of time
+  // Create a new build
+  const build = await prisma.build.create({
+    data: {
+      workspaceId,
+      action: transition
+    }
+  })
+
+  if (!lastBuild) return NextResponse.json({ status: "ok, no last build" })
+
+  // If the last build was a start, charge the user with the started price
+  if (lastBuild.action === "start") {
+    // Calculate the time between the last build and this one
+    const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
+    const durationHours = duration / (1000 * 60 * 60)
+
+    // Calculate the amount to charge based on the total price and duration
+    const amount = startedPrice * durationHours;
+
     await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      action: 'increment',
-      quantity: Math.round(template?.startedPrice * timeDifference),
-      timestamp: 'now'
+      quantity: Math.round(amount * durationHours) * 100,
+      timestamp: "now",
+      action: "increment",
     })
   }
-  if (transition == "start") {
-    const lastStop = await prisma.build.findFirst({
-      where: {
-        workspaceId,
-        action: "stop"
-      },
-      orderBy: {
-        createdAt: "desc"
-      }
-    })
-    if (!lastStop) return NextResponse.json({ status: "ok" })
 
-    const timeDifference = (new Date(build.createdAt).getTime() - new Date(lastStop!.createdAt).getTime()) / (1000 * 60 * 60)
-    // We will now tell stripe that the user has used the workspace for this amount of time
+  // If the last build was a stop, charge the user with the stopped price
+  if (lastBuild.action === "stop") {
+    // Calculate the time between the last build and this one
+    const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
+    const durationHours = duration / (1000 * 60 * 60)
+
+    // Calculate the amount to charge based on the total price and duration
+    const amount = stoppedPrice * durationHours
+
     await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      action: 'increment',
-      quantity: Math.round(template?.stoppedPrice * timeDifference),
-      timestamp: 'now'
+      quantity: Math.round(amount * durationHours) * 100,
+      timestamp: "now",
+      action: "increment",
     })
+  }
+
+  // If the worspace is being destroyed, delete it
+  if (build.action === "destroy") {
+    await prisma.workspace.delete({ where: { id: workspaceId } })
   }
   return NextResponse.json({ status: "ok" })
 }

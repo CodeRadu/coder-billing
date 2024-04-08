@@ -13,7 +13,7 @@ export default async function RootLayout({
   return (
     <>
       <SideBar />
-      {children}
+      <div className="my-5 mx-20">{children}</div>
     </>
   );
 }

@@ -1,6 +1,7 @@
 "use server";
 import { Session } from "next-auth";
 import { getPrisma } from "../db";
+import { stripe } from "../stripe";
 
 const prisma = getPrisma();
 
@@ -18,5 +19,10 @@ export async function getAllUsers() {
 }
 
 export async function deleteUser(id: string) {
+  const customer = await prisma.stripeCustomer.findUnique({ where: { userId: id } })
+  if (customer) {
+    if (customer.stripeSubscriptionId) await stripe.subscriptions.cancel(customer.stripeSubscriptionId)
+    await stripe.customers.del(customer.id)
+  }
   return prisma.user.delete({ where: { id } })
 }

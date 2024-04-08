@@ -1,6 +1,6 @@
 "use server"
 
-import { CoderTemplate } from "@/types/coder"
+import { CoderTemplate, CoderTemplateResource } from "@/types/coder"
 import { coderApiRequest, getOrganizationId } from "./apiRequest"
 import { getPrisma } from "../db"
 
@@ -29,9 +29,20 @@ export async function importCoderTemplate(template: CoderTemplate) {
       id: template.id,
       displayName: template.display_name,
       name: template.name,
-      startedPrice: 0,
-      stoppedPrice: 0
+      version: template.active_version_id
     }
+  })
+  const resources = await coderApiRequest("GET", `/templateversions/${template.active_version_id}/resources`) as CoderTemplateResource[]
+  await prisma.templateResource.createMany({
+    data: resources.map(resource => (
+      {
+        id: resource.id,
+        name: resource.name,
+        type: resource.type,
+        templateId: template.id
+      }
+    )),
+    skipDuplicates: true
   })
   return importedTemplate
 }

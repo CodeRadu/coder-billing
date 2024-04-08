@@ -1,3 +1,65 @@
+import { getPrisma } from "@/util/db";
+import { getUser } from "@/util/db/user";
+import { Metadata } from "next";
+import { getServerSession } from "next-auth";
+import Head from "next/head";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
+
+const prisma = getPrisma();
+
 export default async function Page() {
-  return <div className="my-5 mx-20">Workspaces</div>;
+  const session = await getServerSession();
+  const user = await getUser(session!);
+  const workspaces = await prisma.workspace.findMany({
+    where: {
+      userId: user!.id,
+    },
+    include: {
+      builds: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      },
+      template: true,
+    },
+  });
+  return (
+    <div className="">
+      <Head>
+        <title>Dashboard</title>
+      </Head>
+      <span className="text-2xl">Your workspaces</span>
+      <div className="table">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Template</th>
+              <th scope="col">Last build</th>
+            </tr>
+          </thead>
+          <tbody>
+            {workspaces.map((workspace) => {
+              return (
+                <tr key={workspace.id}>
+                  <td>{workspace.name}</td>
+                  <td>
+                    {workspace.template?.displayName ||
+                      workspace.template?.name}
+                  </td>
+                  <td>{workspace.builds[0]?.action || "N/A"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }

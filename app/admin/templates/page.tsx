@@ -1,9 +1,15 @@
 import { getAllCoderTemplates } from "@/util/coder/template";
-import { getAllTemplates, getTemplate } from "@/util/db/template";
+import { getAllTemplates } from "@/util/db/template";
 import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa6";
+import { DeleteTemplateButton } from "./Delete";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Templates",
+};
 
 export default async function Page() {
   const templates = await getAllCoderTemplates();
@@ -30,12 +36,18 @@ export default async function Page() {
                 <td>
                   {importedTemplates.find((t) => t.id == template.id) !=
                   null ? (
-                    <Link
-                      className="text-green-500 disabled:text-green-200 flex items-center"
-                      href={`/admin/templates/edit/${template.id}`}
-                    >
-                      Edit <FaArrowRight className="pl-1" />
-                    </Link>
+                    <>
+                      <Link
+                        className="text-green-500 disabled:text-green-200 flex items-center"
+                        href={`/admin/templates/edit/${template.id}`}
+                      >
+                        Edit <FaArrowRight className="pl-1" />
+                      </Link>
+                      <DeleteTemplateButton
+                        disabled={false}
+                        template={template}
+                      />
+                    </>
                   ) : (
                     <Link
                       className="text-blue-500 disabled:text-blue-200 flex items-center"

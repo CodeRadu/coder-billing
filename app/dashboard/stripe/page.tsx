@@ -5,6 +5,13 @@ import { env } from "@/util/env";
 import { redirect } from "next/navigation";
 import PortalButton from "./PortalButton";
 import { getPrisma } from "@/util/db";
+import { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Your subscription",
+};
 
 const prisma = getPrisma();
 
@@ -29,8 +36,14 @@ export default async function Page() {
   const customer = await prisma.stripeCustomer.findUnique({
     where: { id: user.stripeCustomerId },
   });
+  const subscription = await stripe.subscriptions.retrieve(
+    customer?.stripeSubscriptionId!
+  );
+  const nextInvoice = await stripe.invoices.retrieveUpcoming({
+    subscription: customer?.stripeSubscriptionId!,
+  });
   return (
-    <div className="py-5 px-20 ">
+    <div className="">
       You are subscribed <PortalButton customerId={user.stripeCustomerId} />
       <br />
       {customer?.stripeSubscriptionEndDate && (
@@ -41,6 +54,15 @@ export default async function Page() {
           ).toLocaleDateString()}
         </span>
       )}
+      <span>
+        Next payment:{" "}
+        {subscription.current_period_end &&
+          new Date(
+            subscription.current_period_end * 1000
+          ).toLocaleDateString()}{" "}
+        of {(nextInvoice.amount_due / 100).toFixed(2)}{" "}
+        {subscription.currency.toUpperCase()}
+      </span>
     </div>
   );
 }
