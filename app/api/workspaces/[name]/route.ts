@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const amount = startedPrice * durationHours;
 
     await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      quantity: Math.round(amount * durationHours) * 100,
+      quantity: Math.round(amount) * 100,
       timestamp: "now",
       action: "increment",
     })
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     const amount = stoppedPrice * durationHours
 
     await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      quantity: Math.round(amount * durationHours) * 100,
+      quantity: Math.round(amount) * 100,
       timestamp: "now",
       action: "increment",
     })
