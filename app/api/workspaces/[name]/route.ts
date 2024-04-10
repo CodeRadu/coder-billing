@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
   if (!template) return NextResponse.json({ status: "ok, template not configured" })
 
   const user = await prisma.user.findUnique({ where: { username: workspace.owner_name } })
-  if (user?.admin) return NextResponse.json({ status: "ok, user is admin" }) // Don't charge admins
 
   const customer = await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } })
 
@@ -61,6 +60,8 @@ export async function POST(req: NextRequest) {
 
   if (!lastBuild) return NextResponse.json({ status: "ok, no last build" })
 
+  if (user?.admin) return NextResponse.json({ status: "ok, user is admin" }) // Don't charge admins
+  
   // If the last build was a start, charge the user with the started price
   if (lastBuild.action === "start") {
     // Calculate the time between the last build and this one
