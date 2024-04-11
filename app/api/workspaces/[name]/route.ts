@@ -58,40 +58,40 @@ export async function POST(req: NextRequest) {
 
   if (!lastBuild) return NextResponse.json({ status: "ok, no last build" })
 
-  if (user?.admin) return NextResponse.json({ status: "ok, user is admin" }) // Don't charge admins
-
-  const customer = await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } })
+  if (!user?.admin) {
+    const customer = await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } })
+    
+    // If the last build was a start, charge the user with the started price
+    if (lastBuild.action === "start") {
+      // Calculate the time between the last build and this one
+      const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
+      const durationHours = duration / (1000 * 60 * 60)
   
-  // If the last build was a start, charge the user with the started price
-  if (lastBuild.action === "start") {
-    // Calculate the time between the last build and this one
-    const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
-    const durationHours = duration / (1000 * 60 * 60)
-
-    // Calculate the amount to charge based on the total price and duration
-    const amount = startedPrice * durationHours;
-
-    await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      quantity: Math.round(amount) * 100,
-      timestamp: "now",
-      action: "increment",
-    })
-  }
-
-  // If the last build was a stop, charge the user with the stopped price
-  if (lastBuild.action === "stop") {
-    // Calculate the time between the last build and this one
-    const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
-    const durationHours = duration / (1000 * 60 * 60)
-
-    // Calculate the amount to charge based on the total price and duration
-    const amount = stoppedPrice * durationHours
-
-    await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      quantity: Math.round(amount) * 100,
-      timestamp: "now",
-      action: "increment",
-    })
+      // Calculate the amount to charge based on the total price and duration
+      const amount = startedPrice * durationHours;
+  
+      await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
+        quantity: Math.round(amount) * 100,
+        timestamp: "now",
+        action: "increment",
+      })
+    }
+  
+    // If the last build was a stop, charge the user with the stopped price
+    if (lastBuild.action === "stop") {
+      // Calculate the time between the last build and this one
+      const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
+      const durationHours = duration / (1000 * 60 * 60)
+  
+      // Calculate the amount to charge based on the total price and duration
+      const amount = stoppedPrice * durationHours
+  
+      await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
+        quantity: Math.round(amount) * 100,
+        timestamp: "now",
+        action: "increment",
+      })
+    }
   }
 
   // If the worspace is being destroyed, delete it
