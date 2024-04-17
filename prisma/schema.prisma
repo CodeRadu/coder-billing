@@ -44,6 +44,15 @@ model Template {
   workspaces  Workspace[]
   version     String
   resources   TemplateResource[]
+  token       TemplateToken?
+}
+
+model TemplateToken {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  templateId String?   @unique
+  Template   Template? @relation(fields: [templateId], references: [id], onDelete: Cascade)
 }
 
 model TemplateResource {
@@ -80,6 +89,7 @@ model Build {
   updatedAt   DateTime  @updatedAt
   workspaceId String
   action      Action
+  buildCost   Float?    @default(0)
 }
 
 enum Action {

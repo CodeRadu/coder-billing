@@ -21,8 +21,8 @@ export default async function Page() {
   async function subscribe() {
     const session = await stripe.checkout.sessions.create({
       customer_email: user?.email,
-      success_url: `${env.PUBLIC_URL}/dashboard/stripe`,
-      cancel_url: `${env.PUBLIC_URL}/dashboard/stripe/error`,
+      success_url: `${env.NEXTAUTH_URL}/dashboard/stripe`,
+      cancel_url: `${env.NEXTAUTH_URL}/dashboard/stripe/error`,
       line_items: [
         {
           price: env.STRIPE_UNIT_PRICE,

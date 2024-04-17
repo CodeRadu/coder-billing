@@ -3,6 +3,7 @@
 import { CoderTemplate, CoderTemplateResource } from "@/types/coder"
 import { coderApiRequest, getOrganizationId } from "./apiRequest"
 import { getPrisma } from "../db"
+import { TemplateToken } from "@prisma/client"
 
 const prisma = getPrisma()
 
@@ -23,13 +24,18 @@ export async function getCoderTemplateResources(versionId: string) {
   return resources
 }
 
-export async function importCoderTemplate(template: CoderTemplate) {
+export async function importCoderTemplate(template: CoderTemplate, token: TemplateToken) {
   const importedTemplate = await prisma.template.create({
     data: {
       id: template.id,
       displayName: template.display_name,
       name: template.name,
-      version: template.active_version_id
+      version: template.active_version_id,
+      token: {
+        connect: {
+          id: token.id
+        }
+      }
     }
   })
   const resources = await coderApiRequest("GET", `/templateversions/${template.active_version_id}/resources`) as CoderTemplateResource[]

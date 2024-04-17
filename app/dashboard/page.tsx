@@ -3,6 +3,7 @@ import { getUser } from "@/util/db/user";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import Head from "next/head";
+import RefreshButton from "./Refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -24,17 +25,17 @@ export default async function Page() {
         orderBy: {
           createdAt: "desc",
         },
-        take: 1,
+        take: 2,
       },
       template: true,
     },
   });
   return (
     <div className="">
-      <Head>
-        <title>Dashboard</title>
-      </Head>
       <span className="text-2xl">Your workspaces</span>
+      <div className="relative top-0 right-0">
+        <RefreshButton />
+      </div>
       <div className="table">
         <table>
           <thead>
@@ -42,6 +43,7 @@ export default async function Page() {
               <th scope="col">Name</th>
               <th scope="col">Template</th>
               <th scope="col">Last build</th>
+              <th scope="col">Last cost</th>
             </tr>
           </thead>
           <tbody>
@@ -54,6 +56,7 @@ export default async function Page() {
                       workspace.template?.name}
                   </td>
                   <td>{workspace.builds[0]?.action || "N/A"}</td>
+                  <td>{workspace.builds[1]?.buildCost?.toFixed(4)}</td>
                 </tr>
               );
             })}

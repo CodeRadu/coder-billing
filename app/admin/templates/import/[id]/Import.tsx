@@ -2,19 +2,21 @@
 
 import { CoderTemplate } from "@/types/coder";
 import { importCoderTemplate } from "@/util/coder/template";
+import { TemplateToken } from "@prisma/client";
 import { redirect, useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 
 type Props = {
   template: CoderTemplate;
+  token: TemplateToken;
 };
 
-export default function ImportButton({ template }: Props) {
+export default function ImportButton({ template, token }: Props) {
   const [isImporting, setIsImporting] = useState(false);
   const { refresh } = useRouter();
   const importTemplate = async () => {
     setIsImporting(true);
-    await importCoderTemplate(template);
+    await importCoderTemplate(template, token);
     startTransition(() => {
       refresh();
     });
