@@ -9,7 +9,7 @@ const prisma = getPrisma()
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const token = req.headers.get("Authorization")?.split("Bearer ")[1]
-  if (!token) return NextResponse.json({ status: "error, no token" }, { status: 400 })
+  if (!token) return NextResponse.json({ status: "error, no token" }, { status: 401 })
 
   const { workspaceId, transition } = body
 
@@ -61,9 +61,18 @@ export async function POST(req: NextRequest) {
     }
   })
 
+  // If the worspace is being destroyed, delete it
+  if (build.action === "destroy") {
+    await prisma.workspace.delete({ where: { id: workspaceId } })
+  }
+
   if (!lastBuild) return NextResponse.json({ status: "ok, no last build" })
 
-  if (user?.admin) return NextResponse.json({ status: "ok, admin" })
+  let admin = false
+
+  if (user?.admin) admin = true
+
+  if (user?.stripeCustomerId === null) return NextResponse.json({ status: "error, paid workspace" }, { status: 401 }) // If the user is not subscribed, don't allow them to start the workspace
 
   const customer = await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } })
 
@@ -76,7 +85,7 @@ export async function POST(req: NextRequest) {
     // Calculate the amount to charge based on the total price and duration
     const amount = startedPrice * durationHours;
 
-    await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
+    if (!admin) await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
       quantity: Math.round(amount * 100),
       timestamp: "now",
       action: "increment",
@@ -101,7 +110,7 @@ export async function POST(req: NextRequest) {
     // Calculate the amount to charge based on the total price and duration
     const amount = stoppedPrice * durationHours
 
-    await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
+    if (!admin) await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
       quantity: Math.round(amount * 100),
       timestamp: "now",
       action: "increment",
@@ -117,10 +126,5 @@ export async function POST(req: NextRequest) {
     })
   }
 
-
-  // If the worspace is being destroyed, delete it
-  if (build.action === "destroy") {
-    await prisma.workspace.delete({ where: { id: workspaceId } })
-  }
   return NextResponse.json({ status: "ok" })
 }

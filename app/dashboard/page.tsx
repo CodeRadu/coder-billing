@@ -33,6 +33,11 @@ export default async function Page() {
   return (
     <div className="">
       <span className="text-2xl">Your workspaces</span>
+      {user?.admin && (
+        <span className="text-sm">
+          Since you are an admin, you do not pay for any workspaces
+        </span>
+      )}
       <div className="relative top-0 right-0">
         <RefreshButton />
       </div>
