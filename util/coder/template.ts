@@ -9,17 +9,17 @@ const prisma = getPrisma()
 
 export async function getAllCoderTemplates() {
   const org = await getOrganizationId()
-  const templates = await coderApiRequest("GET", `/organizations/${org}/templates`)
+  const templates = await coderApiRequest({ method: "GET", path: `/organizations/${org}/templates` })
   return templates as CoderTemplate[]
 }
 
 export async function getCoderTemplate(id: string) {
-  const template = await coderApiRequest("GET", `/templates/${id}`)
+  const template = await coderApiRequest({ method: "GET", path: `/templates/${id}` })
   return template as CoderTemplate
 }
 
 export async function getCoderTemplateResources(versionId: string) {
-  const resources = await coderApiRequest("GET", `/templateversions/${versionId}/resources`)
+  const resources = await coderApiRequest({ method: "GET", path: `/templateversions/${versionId}/resources` })
   console.log(resources)
   return resources
 }
@@ -38,7 +38,7 @@ export async function importCoderTemplate(template: CoderTemplate, token: Templa
       }
     }
   })
-  const resources = await coderApiRequest("GET", `/templateversions/${template.active_version_id}/resources`) as CoderTemplateResource[]
+  const resources = await coderApiRequest({ method: "GET", path: `/templateversions/${template.active_version_id}/resources` }) as CoderTemplateResource[]
   await prisma.templateResource.createMany({
     data: resources.map(resource => (
       {

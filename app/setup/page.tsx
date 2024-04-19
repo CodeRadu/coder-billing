@@ -1,24 +1,58 @@
 import Input from "@/components/Input";
-import { SubmitButton } from "@/components/SubmitButton";
+import { getPrisma } from "@/util/db";
+import { redirect } from "next/navigation";
+import Form from "@/components/Form";
 import { getCoderApiUser } from "@/util/coder/user";
-import { finishSetup } from "./actions";
 
 export const dynamic = "force-dynamic";
 
+const prisma = getPrisma();
+
 export default async function Page() {
-  const apiUser = await getCoderApiUser();
+  const configured = await prisma.setting.findUnique({
+    where: { key: "CONFIGURED" },
+  });
+  if (configured?.value === "true") return redirect("/");
+
+  const apiUser = await getCoderApiUser()
+
+  async function finishSetup(formData: FormData) {
+    "use server";
+    const { password } = Object.fromEntries(formData)
+    const user = await prisma.user.create({
+      data: {
+        email: apiUser.email,
+        name: apiUser.name,
+        password: password as string,
+        coderUserId: apiUser.id,
+        username: apiUser.username,
+        admin: true,
+      }
+    })
+    // Set configured
+    await prisma.setting.upsert({
+      where: { key: "CONFIGURED" },
+      create: { key: "CONFIGURED", value: "true" },
+      update: { value: "true" },
+    });
+    return redirect("/");
+  }
 
   return (
     <div className="flex justify-center">
-      <div className="w-[40%] p-3">
+      <div className="w-[60%] p-3">
         <span className="text-xl">Setup</span>
         <div className="">
-          Create a secure password for {apiUser?.name} ({apiUser?.email}).
-          <form action={finishSetup}>
-            <label>Password</label>
-            <Input type="password" required name="password" />
-            <SubmitButton>Finish Setup</SubmitButton>
-          </form>
+          <Form submitButtonChildren="Finish setup" action={finishSetup}>
+            <label>Set a strong password for the {apiUser.name} ({apiUser.email}) user</label>
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+          </Form>
         </div>
       </div>
     </div>

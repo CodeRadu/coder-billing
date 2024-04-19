@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   const { workspaceId, transition } = body
 
-  const workspace = await coderApiRequest("GET", `/workspaces/${workspaceId}`).catch(() => null) as CoderWorkspace | null // Get the workspace from Coder
+  const workspace = await coderApiRequest({ path: `/workspaces/${workspaceId}`, method: "GET" }).catch(() => null) as CoderWorkspace | null // Get the workspace from Coder
   if (!workspace) return NextResponse.json({ status: "ok, workspace not found" }) // Probably a template update with a bogus workspace id
 
   const template = await prisma.template.findUnique({ where: { id: workspace.template_id }, include: { resources: true, token: true } })

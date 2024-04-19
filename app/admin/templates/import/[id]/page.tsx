@@ -45,7 +45,7 @@ export default async function Page({ params }: Props) {
           <SyntaxHighlighter language="terraform" showLineNumbers={true}>
             {`...
 data "http" "billing_wh" {
-  url = "${env.PUBLIC_URL}/api/workspaces/${template.name}"
+  url = "${env.NEXTAUTH_URL}/api/workspaces/${template.name}"
   method = "POST"
   request_headers = {
     Authorization: "Bearer $\{file("./billing-token.txt")\}"

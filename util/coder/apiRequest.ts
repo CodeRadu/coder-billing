@@ -1,15 +1,17 @@
 import { CoderUser } from "@/types/coder";
 import { env } from "../env";
+import { getSetting } from "../config";
 
-const coderUrl = env.CODER_URL;
-const coderApiKey = env.CODER_API_KEY;
+const coderUrl = env.CODER_URL
+const coderApiKey = env.CODER_API_KEY
 
 export async function getOrganizationId() {
-  const user = await coderApiRequest("GET", "/users/me") as CoderUser
+  const user = await coderApiRequest({ path: "/users/me", method: "GET" }) as CoderUser
   return user.organization_ids[0];
 }
 
-export async function coderApiRequest(method: string, path: string, body?: any) {
+export async function coderApiRequest({ method, path, body }: { method: string, path: string, body?: any }) {
+  if (!coderUrl || !coderApiKey) throw new Error("Coder URL or API key not set")
   const response = await fetch(`${coderUrl}/api/v2${path}`, {
     method,
     headers: {

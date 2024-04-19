@@ -97,3 +97,13 @@ enum Action {
   stop
   destroy
 }
+
+model Setting {
+  key   SettingKey @id
+  value String
+}
+
+enum SettingKey {
+  CONFIGURED
+  STRIPE_UNIT_PRICE
+}

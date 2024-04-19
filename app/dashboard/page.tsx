@@ -35,6 +35,7 @@ export default async function Page() {
       <span className="text-2xl">Your workspaces</span>
       {user?.admin && (
         <span className="text-sm">
+          <br />
           Since you are an admin, you do not pay for any workspaces
         </span>
       )}

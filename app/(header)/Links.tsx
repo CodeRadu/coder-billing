@@ -17,6 +17,7 @@ const links: Link[] = [
   { href: "/dashboard", label: "Dashboard", protected: true },
   { href: "/admin/templates", label: "Templates", admin: true },
   { href: "/admin/users", label: "Users", admin: true },
+  { href: "/admin/settings", label: "Settings", admin: true },
 ];
 
 export default function Links() {

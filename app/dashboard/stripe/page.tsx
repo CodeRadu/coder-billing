@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import PortalButton from "./PortalButton";
 import { getPrisma } from "@/util/db";
 import { Metadata } from "next";
+import { getSetting } from "@/util/config";
 
 export const dynamic = "force-dynamic";
 
@@ -19,13 +20,14 @@ export default async function Page() {
   const session = await getServerSession();
   const user = await getUser(session!);
   async function subscribe() {
+    const stripeUnitPrice = await getSetting("STRIPE_UNIT_PRICE");
     const session = await stripe.checkout.sessions.create({
       customer_email: user?.email,
       success_url: `${env.NEXTAUTH_URL}/dashboard/stripe`,
       cancel_url: `${env.NEXTAUTH_URL}/dashboard/stripe/error`,
       line_items: [
         {
-          price: env.STRIPE_UNIT_PRICE,
+          price: stripeUnitPrice,
         },
       ],
       mode: "subscription",

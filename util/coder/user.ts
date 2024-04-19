@@ -8,17 +8,17 @@ import { User } from "@prisma/client";
 const prisma = getPrisma()
 
 export async function getCoderApiUser() {
-  const user = await coderApiRequest("GET", "/users/me")
-  return user as CoderUser
+  const user = await coderApiRequest({ path: "/users/me", method: "GET" }) as CoderUser
+  return user
 }
 
 export async function getCoderUser(userId: string) {
-  const user = await coderApiRequest("GET", `/users/${userId}`)
-  return user as CoderUser
+  const user = await coderApiRequest({ path: `/users/${userId}`, method: "GET" }) as CoderUser
+  return user
 }
 
 export async function getAllCoderUsers() {
-  const users = await coderApiRequest("GET", "/users")
+  const users = await coderApiRequest({ path: "/users", method: "GET" })
   return users.users as CoderUser[]
 }
 
