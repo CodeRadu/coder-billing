@@ -39,7 +39,7 @@ jobs:
         id: lowercase_registry
         uses: ASzc/change-string-case-action@v6
         with:
-          string: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ steps.tag.outputs.tag }}
+          string: ghcr.io/${{ github.repository }}:${{ steps.tag.outputs.tag }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
