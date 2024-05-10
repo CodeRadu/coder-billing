@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
   if (user?.admin) admin = true
 
-  if (user?.stripeCustomerId === null) return NextResponse.json({ status: "error, paid workspace" }, { status: 401 }) // If the user is not subscribed, don't allow them to start the workspace
+  if (user?.stripeCustomerId === null && !admin) return NextResponse.json({ status: "error, paid workspace" }, { status: 401 }) // If the user is not subscribed and is not an admin, don't allow them to start the workspace
 
   const customer = await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } })
 
