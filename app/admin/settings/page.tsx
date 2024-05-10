@@ -5,6 +5,7 @@ import { SettingKey } from "@prisma/client"
 
 const settings: SettingKey[] = [
   "STRIPE_UNIT_PRICE",
+  "STRIPE_CURRENCY"
 ]
 
 const prisma = getPrisma()

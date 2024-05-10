@@ -1,6 +1,7 @@
 import Input from "@/components/Input";
 import { getPrisma } from "@/util/db";
 import { redirect } from "next/navigation";
+import ReloadButton from "./Reload";
 
 const prisma = getPrisma();
 
@@ -60,6 +61,9 @@ export default async function Page({ params }: Props) {
   return (
     <div className="">
       <span className="text-2xl">Edit template {template?.displayName}</span>
+      <div className="relative top-0 right-0">
+        <ReloadButton template={template} />
+      </div>
       <form action={editTemplate} className="p-1">
         <div className="table">
           <table>

@@ -41,7 +41,7 @@ export default async function Page({ params }: Props) {
         Billing when the workspace has been started, stopped or deleted.
         <div className="p-5">
           Add the <code className="bg-gray-200 rounded p-1">http</code> data
-          source:
+          source anywhere in <code className="bg-gray-200 rounded p-1">main.tf</code>:
           <SyntaxHighlighter language="terraform" showLineNumbers={true}>
             {`...
 data "http" "billing_wh" {
@@ -67,7 +67,7 @@ data "http" "billing_wh" {
           </SyntaxHighlighter>
           And add the following token to the{" "}
           <code className="bg-gray-200 rounded p-1">billing-token.txt</code>{" "}
-          file
+          file:
           <SyntaxHighlighter language="plaintext" showLineNumbers={true}>
             {newToken.id}
           </SyntaxHighlighter>

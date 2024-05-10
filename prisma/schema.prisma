@@ -66,7 +66,7 @@ model TemplateResource {
   startedPrice Float?
   stoppedPrice Float?
 
-  @@unique([name, templateId])
+  @@unique([name, type, templateId])
 }
 
 model Workspace {
@@ -106,4 +106,5 @@ model Setting {
 enum SettingKey {
   CONFIGURED
   STRIPE_UNIT_PRICE
+  STRIPE_CURRENCY
 }

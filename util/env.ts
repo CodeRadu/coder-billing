@@ -11,7 +11,6 @@ export const env = createEnv({
     STRIPE_PUBLISHABLE_KEY: z.string(),
     STRIPE_SECRET_KEY: z.string(),
     STRIPE_SIGNING_SECRET: z.string(),
-    STRIPE_CURRENCY: z.string()
   },
   runtimeEnv: process.env,
   skipValidation: process.env.NEXT_BUILD === 'true',

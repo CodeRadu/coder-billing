@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa6";
 import { DeleteTemplateButton } from "./Delete";
 import { Metadata } from "next";
+import RefreshButton from "@/components/Refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,9 @@ export default async function Page() {
   return (
     <div className="">
       <span className="text-2xl">Templates</span>
+      <div className="relative top-0 right-0">
+        <RefreshButton />
+      </div>
       <div className="table">
         <table>
           <thead>
@@ -35,7 +39,7 @@ export default async function Page() {
                 <td>{template.active_version_id}</td>
                 <td>
                   {importedTemplates.find((t) => t.id == template.id) !=
-                  null ? (
+                    null ? (
                     <>
                       <Link
                         className="text-green-500 disabled:text-green-200 flex items-center"

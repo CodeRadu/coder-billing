@@ -34,6 +34,9 @@ export default async function Page() {
     });
     return session;
   }
+  if (user?.admin) return <div>
+    You cannot subscribe because you are an admin.
+  </div>
   if (!user?.stripeCustomerId) return redirect((await subscribe()).url!);
   const customer = await prisma.stripeCustomer.findUnique({
     where: { id: user.stripeCustomerId },
@@ -45,7 +48,7 @@ export default async function Page() {
     subscription: customer?.stripeSubscriptionId!,
   });
   return (
-    <div className="">
+    <div>
       You are subscribed <PortalButton customerId={user.stripeCustomerId} />
       <br />
       {customer?.stripeSubscriptionEndDate && (

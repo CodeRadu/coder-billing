@@ -1,7 +1,7 @@
 "use client";
 
 import { CoderTemplate } from "@/types/coder";
-import { importCoderTemplate } from "@/util/coder/template";
+import { cleanupUnusedTokens, importCoderTemplate } from "@/util/coder/template";
 import { TemplateToken } from "@prisma/client";
 import { redirect, useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
@@ -17,6 +17,7 @@ export default function ImportButton({ template, token }: Props) {
   const importTemplate = async () => {
     setIsImporting(true);
     await importCoderTemplate(template, token);
+    await cleanupUnusedTokens(); // Delete tokens that are not connected to any templates
     startTransition(() => {
       refresh();
     });

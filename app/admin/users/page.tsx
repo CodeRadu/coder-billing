@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { DeleteUserButton, ImportUserButton } from "./Actions";
 import { getPrisma } from "@/util/db";
 import { Metadata } from "next";
+import RefreshButton from "@/components/Refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,9 @@ export default async function Users() {
   return (
     <div className="">
       <span className="text-2xl">Imported Users</span>
+      <div className="relative top-0 right-0">
+        <RefreshButton />
+      </div>
       <div className="table">
         <table>
           <thead>
@@ -36,8 +40,8 @@ export default async function Users() {
             {users.map(async (user) => {
               const customer = user.stripeCustomerId
                 ? await prisma.stripeCustomer.findUnique({
-                    where: { id: user.stripeCustomerId },
-                  })
+                  where: { id: user.stripeCustomerId },
+                })
                 : null;
               return (
                 <tr key={user.id}>

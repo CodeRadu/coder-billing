@@ -3,7 +3,7 @@ import { getUser } from "@/util/db/user";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import Head from "next/head";
-import RefreshButton from "./Refresh";
+import RefreshButton from "@/components/Refresh";
 
 export const dynamic = "force-dynamic";
 
