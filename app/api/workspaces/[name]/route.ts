@@ -61,11 +61,6 @@ export async function POST(req: NextRequest) {
     }
   })
 
-  // If the worspace is being destroyed, delete it
-  if (build.action === "destroy") {
-    await prisma.workspace.delete({ where: { id: workspaceId } })
-  }
-
   if (!lastBuild) return NextResponse.json({ status: "ok, no last build" })
 
   let admin = false
@@ -124,6 +119,11 @@ export async function POST(req: NextRequest) {
         buildCost: amount
       }
     })
+  }
+
+  // If the worspace is being destroyed, delete it
+  if (build.action === "destroy") {
+    await prisma.workspace.delete({ where: { id: workspaceId } })
   }
 
   return NextResponse.json({ status: "ok" })
