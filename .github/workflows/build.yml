@@ -24,7 +24,7 @@ jobs:
       - name: Determine tag
         id: tag
         run: |
-          if [[ "${{ github.ref }}" == "refs/head/main" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
           else
             echo "tag=${{ github.sha }}" >> $GITHUB_OUTPUT
