@@ -30,27 +30,17 @@ jobs:
         uses: ASzc/change-string-case-action@v6
         with:
           string: ghcr.io/${{ github.repository }}
-      - name: Generate tags
-        id: tag
-        run: |
-          BASE_IMAGE_NAME=${{ steps.lowercase_registry.outputs.lowercase }}
-          TAGS=()
-          FULL_TAGS=()
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            current_date=$(date +'%Y%m%d')
-            TAGS+=("latest")
-            TAGS+=("${{ github.sha }}")
-            TAGS+=("${current_date}")
-          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-            current_date=$(date +'%Y%m%d')
-            TAGS+=("dev")
-            TAGS+=("${{ github.sha }}")
-            TAGS+=("${current_date}")
-          fi
-          for TAG in "${TAGS[@]}"; do
-            FULL_TAGS+=$(printf "${BASE_IMAGE_NAME}:${TAG}\n")
-          done
-          echo "tags=${FULL_TAGS[*]}" >> $GITHUB_OUTPUT
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ steps.lowercase_registry.outputs.lowercase }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,
+            type=raw,value=latest,enable={{is_default_branch}}
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -61,7 +51,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
-          push: ${{ github.event_name == 'push' }}
-          tags: |
-            ${{ steps.tag.outputs.tags }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
