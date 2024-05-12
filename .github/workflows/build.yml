@@ -48,7 +48,7 @@ jobs:
             TAGS+=("${current_date}")
           fi
           for TAG in "${TAGS[@]}"; do
-            FULL_TAGS+=("${BASE_IMAGE_NAME}:${TAG}\n")
+            FULL_TAGS+=$(printf "${BASE_IMAGE_NAME}:${TAG}\n")
           done
           echo "tags=${FULL_TAGS[*]}" >> $GITHUB_OUTPUT
       - name: Login to Docker Hub
