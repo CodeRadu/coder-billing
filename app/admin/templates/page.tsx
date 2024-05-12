@@ -9,7 +9,7 @@ import RefreshButton from "@/components/Refresh";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Templates",
+  title: "Manage templates",
 };
 
 export default async function Page() {

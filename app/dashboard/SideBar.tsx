@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FaComputer, FaWallet } from "react-icons/fa6";
+import {FaComputer, FaUser, FaWallet} from "react-icons/fa6";
 
 export default function SideBar() {
   return (
@@ -14,6 +14,11 @@ export default function SideBar() {
       <i>
         <Link href="/dashboard/stripe">
           <SideBarIcon icon={<FaWallet size={32} />} text="Billing" />
+        </Link>
+      </i>
+      <i>
+        <Link href="/dashboard/account">
+          <SideBarIcon icon={<FaUser size={32}/>} text={"Account"} />
         </Link>
       </i>
     </div>
