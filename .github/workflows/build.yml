@@ -33,7 +33,9 @@ jobs:
       - name: Generate tags
         id: tag
         run: |
+          BASE_IMAGE_NAME=${{ steps.lowercase_registry.outputs.lowercase }}
           TAGS=()
+          FULL_TAGS=()
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             current_date=$(date +'%Y%m%d')
             TAGS+=("latest")
@@ -45,7 +47,10 @@ jobs:
             TAGS+=("${{ github.sha }}")
             TAGS+=("${current_date}")
           fi
-          echo "tags=${TAGS[*]}" >> $GITHUB_OUTPUT
+          for TAG in "${TAGS[@]}"; do
+            FULL_TAGS+=("${BASE_IMAGE_NAME}:${TAG}")
+          done
+          echo "tags=${FULL_TAGS[*]}" >> $GITHUB_OUTPUT
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
