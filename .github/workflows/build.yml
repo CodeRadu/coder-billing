@@ -3,6 +3,8 @@ on:
     branches:
       - main
       - dev
+    paths-ignore:
+      - .devcontainer
   pull_request:
     branches:
       - main
