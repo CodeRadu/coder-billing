@@ -64,4 +64,4 @@ jobs:
           file: ./Dockerfile
           push: ${{ github.event_name == 'push' }}
           tags: |
-            ${{ steps.lowercase_registry.outputs.lowercase}}:${{ steps.tag.outputs.tags }}
+            ${{ steps.tag.outputs.tags }}
