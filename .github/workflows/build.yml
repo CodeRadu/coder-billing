@@ -39,7 +39,6 @@ jobs:
             TAGS+=("latest")
             TAGS+=("${{ github.sha }}")
             TAGS+=("${current_date}")
-          fi
           else if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             current_date=$(date +'%Y%m%d')
             TAGS+=("dev")
