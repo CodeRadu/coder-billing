@@ -74,6 +74,7 @@ export default async function Users() {
             <tr>
               <th scope="col">Username</th>
               <th scope="col">Email</th>
+              <th scope="col">Status</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
@@ -82,6 +83,7 @@ export default async function Users() {
               <tr key={user.id}>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
+                <td>{user.status}</td>
                 <td>
                   <ImportUserButton
                     disabled={users.find((u) => u.email == user.email) != null}
