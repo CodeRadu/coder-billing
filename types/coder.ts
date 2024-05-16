@@ -7,7 +7,7 @@ export const Role = z.object({
 
 export type RoleType = z.infer<typeof Role>;
 
-export const Status = z.enum(["active", "inactive"])
+export const Status = z.enum(["active", "inactive", "dormant"])
 
 export const CoderUser = z.object({
   avatar_url: z.string(),
@@ -45,8 +45,6 @@ export const CoderTemplate = z.object({
   icon: z.string(),
   default_ttl_ms: z.number(),
   activity_bump_ms: z.number(),
-  use_max_ttl: z.boolean(),
-  max_ttl_ms: z.number(),
   autostop_requirement: z.any(),
   autostart_requirement: z.any(),
   created_by_id: z.string(),
@@ -100,7 +98,7 @@ export const WorkspaceTransition = z.enum(["start", "stop", "destroy"])
 
 export const CoderTemplateResource = z.object({
   id: z.string(),
-  agents: z.any().array(),
+  agents: z.any().array().optional(),
   created_at: z.string(),
   daily_cost: z.number(),
   hide: z.boolean(),
@@ -113,7 +111,7 @@ export const CoderTemplateResource = z.object({
     key: z.string(),
     value: z.string(),
     sensitive: z.boolean()
-  }))
+  })).optional()
 })
 
 export type CoderTemplateResourceType = z.infer<typeof CoderTemplateResource>;

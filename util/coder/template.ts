@@ -85,7 +85,6 @@ export async function updateCoderTemplate(template: Template) {
         type: resource.type,
         templateId: template.id
       },
-
     })
   })
 }
