@@ -1,6 +1,6 @@
 "use client";
 
-import { CoderTemplate } from "@/types/coder";
+import { CoderTemplateType } from "@/types/coder";
 import { deleteTemplate } from "@/util/db/template";
 import { Dialog } from "@headlessui/react";
 import { useRouter } from "next/navigation";
@@ -11,11 +11,11 @@ export function DeleteTemplateButton({
   template,
   disabled,
 }: {
-  template: CoderTemplate;
+  template: CoderTemplateType;
   disabled: boolean;
 }) {
   const [templateToDelete, setTemplateToDelete] =
-    useState<CoderTemplate | null>(null);
+    useState<CoderTemplateType | null>(null);
   const { refresh } = useRouter();
 
   return (
@@ -45,7 +45,7 @@ export function DeleteTemplateButton({
 }
 
 type DeleteModalProps = {
-  template: CoderTemplate;
+  template: CoderTemplateType;
   cancelAction: () => void;
   confirmAction: () => void;
 };

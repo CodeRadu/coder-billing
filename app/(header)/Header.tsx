@@ -1,7 +1,5 @@
-import { getUser } from "@/util/db/user";
 import Link from "next/link";
 import AuthButtons from "./AuthButtons";
-import { getServerSession } from "next-auth";
 import Links from "./Links";
 
 export default async function Header() {

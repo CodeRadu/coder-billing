@@ -1,13 +1,13 @@
 "use client";
 
-import { CoderTemplate } from "@/types/coder";
+import { CoderTemplateType } from "@/types/coder";
 import { cleanupUnusedTokens, importCoderTemplate } from "@/util/coder/template";
 import { TemplateToken } from "@prisma/client";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 
 type Props = {
-  template: CoderTemplate;
+  template: CoderTemplateType;
   token: TemplateToken;
 };
 

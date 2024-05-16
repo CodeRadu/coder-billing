@@ -1,115 +1,119 @@
-type Role = {
-  display_name: string,
-  name: string
-}
+import { z } from 'zod'
 
-enum Status {
-  active = "active",
-  inactive = "inactive"
-}
+export const Role = z.object({
+  display_name: z.string(),
+  name: z.string()
+})
 
-export type CoderUser = {
-  avatar_url: string
-  created_at: string,
-  email: string,
-  id: string,
-  last_seen_at: string,
-  login_type: string,
-  name: string,
-  organization_ids: string[],
-  roles: Role[],
+export type RoleType = z.infer<typeof Role>;
+
+export const Status = z.enum(["active", "inactive"])
+
+export const CoderUser = z.object({
+  avatar_url: z.string(),
+  created_at: z.string(),
+  email: z.string(),
+  id: z.string(),
+  last_seen_at: z.string(),
+  login_type: z.string(),
+  name: z.string(),
+  organization_ids: z.array(z.string()),
+  roles: Role.array(),
   status: Status,
-  theme_preference: string,
-  username: string
-}
+  theme_preference: z.string(),
+  username: z.string()
+})
 
-enum Provisioner {
-  terraform = "terraform"
-}
+export type CoderUserType = z.infer<typeof CoderUser>;
 
-export type CoderTemplate = {
-  id: string,
-  created_at: string,
-  updated_at: string,
-  organization_id: string,
-  name: string,
-  display_name: string,
+export const Provisioner = z.enum(["terraform"])
+
+export const CoderTemplate = z.object({
+  id: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  organization_id: z.string(),
+  name: z.string(),
+  display_name: z.string(),
   provisioner: Provisioner,
-  active_version_id: string,
-  active_user_count: number,
-  build_time_stats: any,
-  description: string,
-  deprecated: boolean,
-  deprecation_message: string,
-  icon: string,
-  default_ttl_ms: number,
-  activity_bump_ms: number,
-  use_max_ttl: boolean,
-  max_ttl_ms: number,
-  autostop_requirement: any,
-  autostart_requirement: any,
-  created_by_id: string,
-  created_by_name: string,
-  allow_user_autostart: boolean,
-  allow_user_autostop: boolean,
-  allow_user_cancel_workspace_jobs: boolean,
-  failure_ttl_ms: number,
-  time_til_dormant_ms: number,
-  time_til_dormant_autodelete_ms: number,
-  require_active_version: boolean,
-  max_port_share_level: string
-}
+  active_version_id: z.string(),
+  active_user_count: z.number(),
+  build_time_stats: z.any(),
+  description: z.string(),
+  deprecated: z.boolean(),
+  deprecation_message: z.string(),
+  icon: z.string(),
+  default_ttl_ms: z.number(),
+  activity_bump_ms: z.number(),
+  use_max_ttl: z.boolean(),
+  max_ttl_ms: z.number(),
+  autostop_requirement: z.any(),
+  autostart_requirement: z.any(),
+  created_by_id: z.string(),
+  created_by_name: z.string(),
+  allow_user_autostart: z.boolean(),
+  allow_user_autostop: z.boolean(),
+  allow_user_cancel_workspace_jobs: z.boolean(),
+  failure_ttl_ms: z.number(),
+  time_til_dormant_ms: z.number(),
+  time_til_dormant_autodelete_ms: z.number(),
+  require_active_version: z.boolean(),
+  max_port_share_level: z.string()
+})
 
-export type CoderWorkspace = {
-  id: string,
-  created_at: string,
-  updated_at: string,
-  owner_id: string,
-  owner_name: string,
-  owner_avatar_url: string,
-  organization_id: string,
-  template_id: string,
-  template_name: string,
-  template_display_name: string,
-  template_icon: string,
-  template_allow_user_cancel_workspace_jobs: boolean,
-  template_active_version_id: string,
-  template_require_active_version: boolean,
-  latest_build: any,
-  outdated: boolean,
-  name: string,
-  ttl_ms: number,
-  last_used_at: string,
-  deleting_at: string | null,
-  dormant_at: string | null,
-  health: { healthy: boolean, failing_agents: string[] },
-  automatic_updates: string,
-  allow_renames: boolean,
-  favorite: boolean
-}
+export type CoderTemplateType = z.infer<typeof CoderTemplate>;
 
-enum WorkspaceTransition {
-  START = "start",
-  STOP = "stop",
-  DESTROY = "destroy"
-}
+export const CoderWorkspace = z.object({
+  id: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  owner_id: z.string(),
+  owner_name: z.string(),
+  owner_avatar_url: z.string(),
+  organization_id: z.string(),
+  template_id: z.string(),
+  template_name: z.string(),
+  template_display_name: z.string(),
+  template_icon: z.string(),
+  template_allow_user_cancel_workspace_jobs: z.boolean(),
+  template_active_version_id: z.string(),
+  template_require_active_version: z.boolean(),
+  latest_build: z.any(),
+  outdated: z.boolean(),
+  name: z.string(),
+  ttl_ms: z.number(),
+  last_used_at: z.string(),
+  deleting_at: z.string().nullable(),
+  dormant_at: z.string().nullable(),
+  health: z.object({
+    healthy: z.boolean(),
+    failing_agents: z.string().array()
+  }),
+  automatic_updates: z.string(),
+  allow_renames: z.boolean(),
+  favorite: z.boolean()
+})
 
-export type CoderTemplateResource = {
-  id: string,
-  agents?: any[]
-  created_at: string,
-  daily_cost: number,
-  hide: boolean,
-  name: string,
-  type: string,
-  icon: string,
-  job_id: string,
+export type CoderWorkspaceType = z.infer<typeof CoderWorkspace>;
+
+export const WorkspaceTransition = z.enum(["start", "stop", "destroy"])
+
+export const CoderTemplateResource = z.object({
+  id: z.string(),
+  agents: z.any().array(),
+  created_at: z.string(),
+  daily_cost: z.number(),
+  hide: z.boolean(),
+  name: z.string(),
+  type: z.string(),
+  icon: z.string(),
+  job_id: z.string(),
   workspace_transition: WorkspaceTransition,
-  metadata?: [
-    {
-      key: string,
-      value: string,
-      sensitive: boolean
-    }
-  ]
-}
+  metadata: z.array(z.object({
+    key: z.string(),
+    value: z.string(),
+    sensitive: z.boolean()
+  }))
+})
+
+export type CoderTemplateResourceType = z.infer<typeof CoderTemplateResource>;

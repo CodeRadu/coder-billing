@@ -1,7 +1,7 @@
 "use client";
 
 import Input from "@/components/Input";
-import { CoderUser } from "@/types/coder";
+import { CoderUserType } from "@/types/coder";
 import { importCoderUser } from "@/util/coder/user";
 import { deleteUser } from "@/util/db/user";
 import { Dialog } from "@headlessui/react";
@@ -14,10 +14,10 @@ export function ImportUserButton({
   user,
   disabled,
 }: {
-  user: CoderUser;
+  user: CoderUserType;
   disabled: boolean;
 }) {
-  const [importUser, setImportUser] = useState<CoderUser | null>(null);
+  const [importUser, setImportUser] = useState<CoderUserType | null>(null);
   const { refresh } = useRouter();
 
   return (
@@ -83,7 +83,7 @@ export function DeleteUserButton({
 }
 
 type ImportModalProps = {
-  user: CoderUser;
+  user: CoderUserType;
   cancelAction: () => void;
   confirmAction: (password: string) => void;
 };

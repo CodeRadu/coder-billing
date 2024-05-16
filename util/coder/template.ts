@@ -1,6 +1,6 @@
 "use server"
 
-import { CoderTemplate, CoderTemplateResource } from "@/types/coder"
+import { CoderTemplate, CoderTemplateResource, CoderTemplateType } from "@/types/coder"
 import { coderApiRequest, getOrganizationId } from "./apiRequest"
 import { getPrisma } from "../db"
 import { Template, TemplateToken } from "@prisma/client"
@@ -10,15 +10,15 @@ const prisma = getPrisma()
 export async function getAllCoderTemplates() {
   const org = await getOrganizationId()
   const templates = await coderApiRequest({ method: "GET", path: `/organizations/${org}/templates` })
-  return templates as CoderTemplate[]
+  return CoderTemplate.array().parse(templates)
 }
 
 export async function getCoderTemplate(id: string) {
   const template = await coderApiRequest({ method: "GET", path: `/templates/${id}` })
-  return template as CoderTemplate
+  return CoderTemplate.parse(template)
 }
 
-export async function importCoderTemplate(template: CoderTemplate, token: TemplateToken) {
+export async function importCoderTemplate(template: CoderTemplateType, token: TemplateToken) {
   const importedTemplate = await prisma.template.create({
     data: {
       id: template.id,
@@ -32,7 +32,7 @@ export async function importCoderTemplate(template: CoderTemplate, token: Templa
       }
     }
   })
-  const resources = await coderApiRequest({ method: "GET", path: `/templateversions/${template.active_version_id}/resources` }) as CoderTemplateResource[]
+  const resources = CoderTemplateResource.array().parse(await coderApiRequest({ method: "GET", path: `/templateversions/${template.active_version_id}/resources` }))
   await prisma.templateResource.createMany({
     data: resources.map(resource => (
       {
@@ -49,7 +49,7 @@ export async function importCoderTemplate(template: CoderTemplate, token: Templa
 
 export async function updateCoderTemplate(template: Template) {
   const coderTemplate = await getCoderTemplate(template.id)
-  const resources = await coderApiRequest({ method: "GET", path: `/templateversions/${coderTemplate.active_version_id}/resources` }) as CoderTemplateResource[]
+  const resources = CoderTemplateResource.array().parse(await coderApiRequest({ method: "GET", path: `/templateversions/${coderTemplate.active_version_id}/resources` }))
   // Update the template
   await prisma.template.update({
     where: {
