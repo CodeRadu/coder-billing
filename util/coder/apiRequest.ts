@@ -6,7 +6,7 @@ const coderUrl = env.CODER_URL
 const coderApiKey = env.CODER_API_KEY
 
 export async function getOrganizationId() {
-  const user = await coderApiRequest({ path: "/users/me", method: "GET" }) as CoderUser
+  const user = CoderUser.parse(await coderApiRequest({ path: "/users/me", method: "GET" }))
   return user.organization_ids[0];
 }
 

@@ -1,8 +1,6 @@
 "use server"
 
-import { CoderTemplate } from "@/types/coder";
 import { getPrisma } from "../db";
-import { Template } from "@prisma/client";
 
 const prisma = getPrisma()
 
