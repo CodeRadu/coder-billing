@@ -25,13 +25,17 @@ export default async function Page() {
     if (workspacePrice === "new") {
       const newProduct = await stripe.products.create({
         name: "Workspace Unit",
-        default_price_data: {
-          currency: currency.toString(),
-          recurring: { interval: "month" },
-          unit_amount: 1 // 1 cent
+      })
+      const newPrice = await stripe.prices.create({
+        currency: currency.toString(),
+        product: newProduct.id,
+        unit_amount: 1, // 1 cent
+        recurring: {
+          interval: "month",
+          aggregate_usage: "sum",
         }
       })
-      price = newProduct.default_price?.toString() as string
+      price = newPrice.id
     }
     else price = workspacePrice.toString()
     const user = await prisma.user.create({
@@ -59,7 +63,7 @@ export default async function Page() {
         <span className="text-xl">Setup</span>
         <div className="">
           <Form submitButtonChildren="Finish setup" action={finishSetup}>
-            <label>Set a strong password for {apiUser.name} ({apiUser.email}).</label>
+            <label>Set a strong password for {apiUser.name ? apiUser.name : apiUser.username} ({apiUser.email}).</label>
             A new user will be created with this email and password.
             <Input
               type="password"
