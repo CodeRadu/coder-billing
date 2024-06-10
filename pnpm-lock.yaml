@@ -42,8 +42,8 @@ dependencies:
     specifier: ^15.5.0
     version: 15.5.0(react@18.3.1)
   stripe:
-    specifier: ^15.6.0
-    version: 15.6.0
+    specifier: ^15.10.0
+    version: 15.10.0
   zod:
     specifier: ^3.22.4
     version: 3.23.8
@@ -3313,8 +3313,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /stripe@15.6.0:
-    resolution: {integrity: sha512-ARG46eQHMmHspnDpj3QTAH8GyEqtE0nesbzpTtQDT/C9nHvOFYri3mIzHEzArzDcKX7HSleTu2VpYoDZIIH7nA==}
+  /stripe@15.10.0:
+    resolution: {integrity: sha512-yM2967TDiNhmPE69R61Btx7URgRJOjAoLRvAa0dUyF5qfDMjDh4Qolr/FaZigxUzBH5/8SphkHpNS4Ie2L5RYg==}
     engines: {node: '>=12.*'}
     dependencies:
       '@types/node': 20.12.11
