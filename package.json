@@ -23,7 +23,7 @@
     "react-dom": "^18",
     "react-icons": "^5.0.1",
     "react-syntax-highlighter": "^15.5.0",
-    "stripe": "^15.6.0",
+    "stripe": "^15.12.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
