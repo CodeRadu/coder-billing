@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@auth/prisma-adapter':
-    specifier: ^1.5.2
-    version: 1.6.0(@prisma/client@5.13.0)
+    specifier: ^2.4.1
+    version: 2.4.1(@prisma/client@5.13.0)
   '@headlessui/react':
     specifier: ^2.0.3
     version: 2.0.3(react-dom@18.3.1)(react@18.3.1)
@@ -93,8 +93,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /@auth/core@0.29.0:
-    resolution: {integrity: sha512-MdfEjU6WRjUnPG1+XeBWrTIlAsLZU6V0imCIqVDDDPxLI6UZWldXVqAA2EsDazGofV78jqiCLHaN85mJITDqdg==}
+  /@auth/core@0.34.1:
+    resolution: {integrity: sha512-tuYU2VIbI8rFbkSwP710LmybB2FXJsPN7j3sjRVfN9SXVQBK2ej6LdewQaofpBGp4Mk+cC2UeiGNH0or4tgaeA==}
     peerDependencies:
       '@simplewebauthn/browser': ^9.0.1
       '@simplewebauthn/server': ^9.0.2
@@ -116,12 +116,12 @@ packages:
       preact-render-to-string: 5.2.3(preact@10.11.3)
     dev: false
 
-  /@auth/prisma-adapter@1.6.0(@prisma/client@5.13.0):
-    resolution: {integrity: sha512-PQU8/Oi5gfjzb0MkhMGVX0Dg877phPzsQdK54+C7ubukCeZPjyvuSAx1vVtWEYVWp2oQvjgG/C6QiDoeC7S10A==}
+  /@auth/prisma-adapter@2.4.1(@prisma/client@5.13.0):
+    resolution: {integrity: sha512-VF5IOTHEWHX6WHUxIbsbc12m34cp5T82fzJfi7DmzwBZb89UsoROejV8l0B1dCTZ+pDIS0d4zN9dSa2gIKywNQ==}
     peerDependencies:
       '@prisma/client': '>=2.26.0 || >=3 || >=4 || >=5'
     dependencies:
-      '@auth/core': 0.29.0
+      '@auth/core': 0.34.1
       '@prisma/client': 5.13.0(prisma@5.13.0)
     transitivePeerDependencies:
       - '@simplewebauthn/browser'
