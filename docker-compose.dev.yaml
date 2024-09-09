@@ -1,0 +1,21 @@
+services:
+  coder:
+    image: ghcr.io/coder/coder:latest
+    environment:
+      - CODER_HTTP_ADDRESS=0.0.0.0:3000
+  coder_billing:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.development.local
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: billing

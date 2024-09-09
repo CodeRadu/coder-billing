@@ -115,3 +115,35 @@ export const CoderTemplateResource = z.object({
 })
 
 export type CoderTemplateResourceType = z.infer<typeof CoderTemplateResource>;
+
+export const TemplateParameterType = z.enum(["string", "number", "bool"])
+
+export const TemplateParameterOption = z.object({
+  name: z.string(),
+  description: z.string(),
+  value: z.string(),
+  icon: z.string()
+})
+
+export type TemplateParameterOptionType = z.infer<typeof TemplateParameterOption>;
+
+export const TemplateParameter = z.object({
+  name: z.string(),
+  display_name: z.string(),
+  description: z.string(),
+  description_plaintext: z.string(),
+  type: TemplateParameterType,
+  default_value: z.string().nullable(),
+  ephemeral: z.boolean(),
+  icon: z.string(),
+  mutable: z.boolean(),
+  options: TemplateParameterOption.array(),
+  required: z.boolean(),
+  validation_error: z.string().optional(),
+  validation_max: z.number().optional(),
+  validation_min: z.number().optional(),
+  validation_monotonic: z.enum(["increasing", "decreasing"]).optional(),
+  validation_regex: z.string().optional(),
+})
+
+export type TemplateParameterType = z.infer<typeof TemplateParameter>;

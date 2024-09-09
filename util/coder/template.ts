@@ -1,6 +1,6 @@
 "use server"
 
-import { CoderTemplate, CoderTemplateResource, CoderTemplateType } from "@/types/coder"
+import { CoderTemplate, CoderTemplateResource, CoderTemplateType, TemplateParameter } from "@/types/coder"
 import { coderApiRequest, getOrganizationId } from "./apiRequest"
 import { getPrisma } from "../db"
 import { Template, TemplateToken } from "@prisma/client"
@@ -44,6 +44,31 @@ export async function importCoderTemplate(template: CoderTemplateType, token: Te
     )),
     skipDuplicates: true
   })
+  const parameters = TemplateParameter.array().parse(await coderApiRequest({ method: "GET", path: `/templateversions/${template.active_version_id}/rich-parameters` }))
+  parameters.forEach(async parameter => {
+    await prisma.templateParameter.create({
+      data: {
+        name: parameter.name,
+        displayName: parameter.display_name,
+        type: parameter.type,
+        templateId: template.id,
+        validationMax: parameter.validation_max,
+        validationMin: parameter.validation_min,
+        options: {
+          createMany: {
+            data: parameter.options.map(option => (
+              {
+                name: option.name,
+                description: option.description,
+                value: option.value,
+              }
+            ))
+          }
+        }
+      },
+    })
+  })
+
   return importedTemplate
 }
 

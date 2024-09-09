@@ -28,6 +28,7 @@ export default async function Page() {
       line_items: [
         {
           price: stripeUnitPrice,
+          quantity: 1,
         },
       ],
       mode: "subscription",
