@@ -19,3 +19,5 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: billing
+    ports:
+      - 5432:5432

@@ -5,6 +5,7 @@ import Form from "@/components/Form";
 import { getCoderApiUser } from "@/util/coder/user";
 import { stripe } from "@/util/stripe";
 import { setSetting } from "@/util/config";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default async function Page() {
         recurring: {
           interval: "month",
           aggregate_usage: "sum",
+          usage_type: "metered",
         }
       })
       price = newPrice.id
@@ -58,9 +60,11 @@ export default async function Page() {
   const prices = await stripe.prices.list({ active: true });
 
   return (
-    <div className="flex justify-center">
-      <div className="w-[60%] p-3">
-        <span className="text-xl">Setup</span>
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Setup</CardTitle>
+      </CardHeader>
+      <CardContent>
         <div className="">
           <Form submitButtonChildren="Finish setup" action={finishSetup}>
             <label>Set a strong password for {apiUser.name ? apiUser.name : apiUser.username} ({apiUser.email}).</label>
@@ -84,14 +88,14 @@ export default async function Page() {
             </Input>
             <label>Select a product for workspaces:</label>
             <Input type="select" id="workspacePrice" name="workspacePrice" required>
-              {products.data.map(product => <option value={product.id} key={product.id}>
+              {products.data.map(product => <option value={prices.data.find(price => price.product === product.id)?.id} key={product.id}>
                 {product.name} - {prices.data.find(price => price.product === product.id)?.id} (Created {new Date(product.created * 1000).toLocaleDateString()})
               </option>)}
               <option value="new">Create a new product and price</option>
             </Input>
           </Form>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
