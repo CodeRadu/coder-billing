@@ -25,15 +25,19 @@ export async function POST(req: NextRequest) {
 
   // Check pricing type
   if (template.pricingType == "fixed") {
-    // Check if the user's subscription includes this price
-    const customer = user?.stripeCustomerId ? await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } }) : null
-    const foundSubscriptionItems = await stripe.subscriptionItems.list({ subscription: customer?.stripeSubscriptionId! })
+    let found = true
 
-    let found = false
-    for (const item of foundSubscriptionItems.data) {
-      if (item.price.id === template.priceId) {
-        found = true
-        break
+    if (!user?.admin) {
+      found = false
+      // Check if the user's subscription includes this price
+      const customer = user?.stripeCustomerId ? await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } }) : null
+      const foundSubscriptionItems = await stripe.subscriptionItems.list({ subscription: customer?.stripeSubscriptionId! })
+
+      for (const item of foundSubscriptionItems.data) {
+        if (item.price.id === template.priceId) {
+          found = true
+          break
+        }
       }
     }
 
