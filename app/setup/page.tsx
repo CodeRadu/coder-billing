@@ -25,7 +25,7 @@ export default async function Page() {
     let price: string
     if (workspacePrice === "new") {
       const newProduct = await stripe.products.create({
-        name: "Workspace Unit",
+        name: "Pay as you go workspaces",
       })
       const newPrice = await stripe.prices.create({
         currency: currency.toString(),
@@ -86,7 +86,7 @@ export default async function Page() {
               <option value="usd">USD</option>
               <option value="eur">EUR</option>
             </Input>
-            <label>Select a product for workspaces:</label>
+            <label>Select a product for pay as you go workspaces:</label>
             <Input type="select" id="workspacePrice" name="workspacePrice" required>
               {products.data.map(product => <option value={prices.data.find(price => price.product === product.id)?.id} key={product.id}>
                 {product.name} - {prices.data.find(price => price.product === product.id)?.id} (Created {new Date(product.created * 1000).toLocaleDateString()})

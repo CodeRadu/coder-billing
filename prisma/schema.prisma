@@ -29,12 +29,12 @@ model User {
 }
 
 model StripeCustomer {
-  id                        String @id
-  stripeSubscriptionId      String
+  id                        String   @id
+  stripeSubscriptionId      String   @unique
   stripeSubscriptionEndDate Int?
-  subscriptionItemId        String
-  User                      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId                    String @unique
+  subscriptionItems         String[]
+  User                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                    String   @unique
 }
 
 model Template {
@@ -46,6 +46,13 @@ model Template {
   resources   TemplateResource[]
   token       TemplateToken?
   parameters  TemplateParameter[]
+  pricingType PricingType         @default(usageBased)
+  priceId     String? // Only for fixed pricing
+}
+
+enum PricingType {
+  fixed
+  usageBased
 }
 
 model TemplateParameter {

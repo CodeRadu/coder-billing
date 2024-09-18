@@ -23,6 +23,56 @@ export async function POST(req: NextRequest) {
 
   const user = await prisma.user.findUnique({ where: { username: workspace.owner_name } })
 
+  // Check pricing type
+  if (template.pricingType == "fixed") {
+    // Check if the user's subscription includes this price
+    const customer = user?.stripeCustomerId ? await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } }) : null
+    const foundSubscriptionItems = await stripe.subscriptionItems.list({ subscription: customer?.stripeSubscriptionId! })
+
+    let found = false
+    for (const item of foundSubscriptionItems.data) {
+      if (item.price.id === template.priceId) {
+        found = true
+        break
+      }
+    }
+
+    if (found) { // The user is subscribed to this workspace
+      if (!await prisma.workspace.findUnique({ where: { id: workspaceId } })) {
+        await prisma.workspace.create({
+          data: {
+            id: workspaceId,
+            name: workspace.name,
+            slug: workspace.name,
+            templateId: workspace.template_id,
+            userId: user!.id,
+          }
+        })
+      }
+
+      // Create a new build
+      const build = await prisma.build.create({
+        data: {
+          workspaceId,
+          action: transition,
+          buildCost: null
+        }
+      })
+
+      if (build.action === "destroy") {
+        await prisma.workspace.delete({ where: { id: workspaceId } })
+      }
+
+      return NextResponse.json({ status: "ok, subscribed" })
+    }
+
+    return NextResponse.json({ status: "error, not subscribed" }, { status: 401 })
+
+  }
+
+
+
+
   // Calculate pricing from resources
   const startedPrice = template.resources.reduce((total, resource) => {
     return total + (resource.startedPrice || 0);
@@ -71,55 +121,55 @@ export async function POST(req: NextRequest) {
 
   const customer = user?.stripeCustomerId ? await prisma.stripeCustomer.findUnique({ where: { id: user!.stripeCustomerId! } }) : null
 
-  // If the last build was a start, charge the user with the started price
-  if (lastBuild.action === "start") {
-    // Calculate the time between the last build and this one
-    const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
-    const durationHours = duration / (1000 * 60 * 60)
+  // // If the last build was a start, charge the user with the started price
+  // if (lastBuild.action === "start") {
+  //   // Calculate the time between the last build and this one
+  //   const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
+  //   const durationHours = duration / (1000 * 60 * 60)
 
-    // Calculate the amount to charge based on the total price and duration
-    const amount = startedPrice * durationHours;
+  //   // Calculate the amount to charge based on the total price and duration
+  //   const amount = startedPrice * durationHours;
 
-    if (!admin) await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      quantity: Math.round(amount * 100),
-      timestamp: "now",
-      action: "increment",
-    })
+  //   if (!admin) await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
+  //     quantity: Math.round(amount * 100),
+  //     timestamp: "now",
+  //     action: "increment",
+  //   })
 
-    await prisma.build.update({
-      where: {
-        id: lastBuild.id
-      },
-      data: {
-        buildCost: amount
-      }
-    })
-  }
+  //   await prisma.build.update({
+  //     where: {
+  //       id: lastBuild.id
+  //     },
+  //     data: {
+  //       buildCost: amount
+  //     }
+  //   })
+  // }
 
-  // If the last build was a stop, charge the user with the stopped price
-  if (lastBuild.action === "stop") {
-    // Calculate the time between the last build and this one
-    const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
-    const durationHours = duration / (1000 * 60 * 60)
+  // // If the last build was a stop, charge the user with the stopped price
+  // if (lastBuild.action === "stop") {
+  //   // Calculate the time between the last build and this one
+  //   const duration = build.createdAt.getTime() - lastBuild.createdAt.getTime()
+  //   const durationHours = duration / (1000 * 60 * 60)
 
-    // Calculate the amount to charge based on the total price and duration
-    const amount = stoppedPrice * durationHours
+  //   // Calculate the amount to charge based on the total price and duration
+  //   const amount = stoppedPrice * durationHours
 
-    if (!admin) await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
-      quantity: Math.round(amount * 100),
-      timestamp: "now",
-      action: "increment",
-    })
+  //   if (!admin) await stripe.subscriptionItems.createUsageRecord(customer?.subscriptionItemId!, {
+  //     quantity: Math.round(amount * 100),
+  //     timestamp: "now",
+  //     action: "increment",
+  //   })
 
-    await prisma.build.update({
-      where: {
-        id: lastBuild.id
-      },
-      data: {
-        buildCost: amount
-      }
-    })
-  }
+  //   await prisma.build.update({
+  //     where: {
+  //       id: lastBuild.id
+  //     },
+  //     data: {
+  //       buildCost: amount
+  //     }
+  //   })
+  // }
 
   // If the worspace is being destroyed, delete it
   if (build.action === "destroy") {
