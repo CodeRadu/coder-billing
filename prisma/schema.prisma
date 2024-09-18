@@ -29,22 +29,64 @@ model User {
 }
 
 model StripeCustomer {
-  id                        String @id
-  stripeSubscriptionId      String
+  id                        String   @id
+  stripeSubscriptionId      String   @unique
   stripeSubscriptionEndDate Int?
-  subscriptionItemId        String
-  User                      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId                    String @unique
+  subscriptionItems         String[]
+  User                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                    String   @unique
 }
 
 model Template {
-  id          String             @id
+  id          String              @id
   name        String
   displayName String
   workspaces  Workspace[]
   version     String
   resources   TemplateResource[]
   token       TemplateToken?
+  parameters  TemplateParameter[]
+  pricingType PricingType         @default(usageBased)
+  priceId     String? // Only for fixed pricing
+}
+
+enum PricingType {
+  fixed
+  usageBased
+}
+
+model TemplateParameter {
+  id                  String                    @id @default(cuid())
+  Template            Template                  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateId          String
+  name                String
+  displayName         String
+  type                TemplateParameterType
+  options             TemplateParameterOption[]
+  validationMin       Float?
+  validationMax       Float?
+  startedPricePerUnit Float?
+  stoppedPricePerUnit Float?
+}
+
+enum TemplateParameterType {
+  number
+  string
+  bool
+  stringlist
+}
+
+model TemplateParameterOption {
+  id                  String            @id @default(cuid())
+  name                String
+  description         String
+  value               String
+  TemplateParameter   TemplateParameter @relation(fields: [templateParameterId], references: [id], onDelete: Cascade)
+  templateParameterId String
+  startedPrice        Float?
+  stoppedPrice        Float?
+
+  @@unique([name, templateParameterId])
 }
 
 model TemplateToken {

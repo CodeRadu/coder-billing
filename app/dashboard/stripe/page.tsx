@@ -7,6 +7,9 @@ import PortalButton from "./PortalButton";
 import { getPrisma } from "@/util/db";
 import { Metadata } from "next";
 import { getSetting } from "@/util/config";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FaPlus } from "react-icons/fa6";
+import PurchaseButton from "./Purchase";
 
 export const dynamic = "force-dynamic";
 
@@ -48,26 +51,43 @@ export default async function Page() {
     subscription: customer?.stripeSubscriptionId!,
   });
   return (
-    <div>
-      You are subscribed <PortalButton customerId={user.stripeCustomerId} />
-      <br />
-      {customer?.stripeSubscriptionEndDate && (
-        <span>
-          Your subscription ends on{" "}
-          {new Date(
-            customer.stripeSubscriptionEndDate * 1000
-          ).toLocaleDateString()}
-        </span>
-      )}
-      <span>
-        Next payment:{" "}
-        {subscription.current_period_end &&
-          new Date(
-            subscription.current_period_end * 1000
-          ).toLocaleDateString()}{" "}
-        of {(nextInvoice.amount_due / 100).toFixed(2)}{" "}
-        {subscription.currency.toUpperCase()}
-      </span>
-    </div>
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Your subscription</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <p className="text-lg font-semibold">
+              Your subscription is currently {subscription.status}.
+            </p>
+          </div>
+          <div>
+            <p className="text-lg font-semibold">
+              The next invoice is for {subscription.currency.toUpperCase()} {nextInvoice.amount_due / 100}.
+            </p>
+          </div>
+          <div>
+            <p className="text-lg font-semibold">
+              {customer?.stripeSubscriptionEndDate ? "Your subscription ends on " + new Date(customer.stripeSubscriptionEndDate * 1000).toLocaleDateString() : "Your subscription renews on " + new Date(subscription.current_period_end * 1000).toLocaleDateString()}.
+            </p>
+          </div>
+          <div className="">
+            You pay for the following items:
+            <ul>
+              {subscription.items.data.map(async (item) => {
+                const product = await stripe.products.retrieve(item.price.product.toString());
+
+                return <li key={item.id}>{product.name} - {item.price.currency.toLocaleUpperCase()} {(item.price.unit_amount ?? 0) / 100} {item.price.recurring?.usage_type == "metered" ? "/unit/month" : "/month"}</li>
+              })}
+            </ul>
+          </div>
+          <div className="flex items-center justify-between">
+            <PortalButton customerId={customer!.id} />
+            <PurchaseButton disabled={customer?.stripeSubscriptionEndDate != null} />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

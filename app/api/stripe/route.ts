@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
                 email: email!
               }
             },
-            subscriptionItemId: itemId
+            subscriptionItems: [itemId]
           }
         })
         await prisma.user.update({

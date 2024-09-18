@@ -35,7 +35,7 @@ export default async function Page() {
       {user?.admin && (
         <span className="text-sm">
           <br />
-          Since you are an admin, you do not pay for any workspaces
+          As an admin you don&apos;t pay for workspaces.
         </span>
       )}
       <div className="relative top-0 right-0">
@@ -48,6 +48,7 @@ export default async function Page() {
               <th scope="col">Name</th>
               <th scope="col">Template</th>
               <th scope="col">Last build</th>
+              <th scope="col">Pricing type</th>
               <th scope="col">Last cost</th>
             </tr>
           </thead>
@@ -61,7 +62,8 @@ export default async function Page() {
                       workspace.template?.name}
                   </td>
                   <td>{workspace.builds[0]?.action || "N/A"}</td>
-                  <td>{workspace.builds[1]?.buildCost?.toFixed(4)}</td>
+                  <td>{workspace.template?.pricingType == "fixed" ? "Fixed" : "Pay as you go"}</td>
+                  <td>{workspace.builds[1]?.buildCost?.toFixed(4) || "N/A"}</td>
                 </tr>
               );
             })}

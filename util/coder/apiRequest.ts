@@ -12,6 +12,7 @@ export async function getOrganizationId() {
 
 export async function coderApiRequest({ method, path, body }: { method: string, path: string, body?: any }) {
   if (!coderUrl || !coderApiKey) throw new Error("Coder URL or API key not set")
+  console.log({ method, path, body })
   const response = await fetch(`${coderUrl}/api/v2${path}`, {
     method,
     headers: {

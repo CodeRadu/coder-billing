@@ -1,0 +1,11 @@
+FROM node:20
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+VOLUME /app
+
+EXPOSE 3000
+
+CMD [ "/app/scripts/dev.sh" ]
